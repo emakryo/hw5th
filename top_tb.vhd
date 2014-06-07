@@ -1,45 +1,62 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
-entity top_tb is
-end top_tb;
+entity news_tb is
+end news_tb;
 
-architecture tb of top_tb is
-  
-  signal tx : std_logic;
-  signal clk : std_logic;
-
-  component sub_top is
-    generic (wtime_in : std_logic_vector(15 downto 0) := x"0032";
-             wtime_out : std_logic_vector(15 downto 0) := x"0032");
-    port(clk : in std_logic;
-         rx : in std_logic;
-         tx : out std_logic);
+architecture example of news_tb is
+  component news
+  port( 
+    MCLK1 : in std_logic;
+    RS_TX : out std_logic;
+    RS_RX : in std_logic);
   end component;
 
-  signal data : std_logic_vector(31 downto 0) :=
-    "1" & x"aa" & "01" & x"32" & "01" & x"94" & "011";
-  
+  signal MCLK1 : std_logic := '0';
+  signal RS_TX : std_logic ;
+  signal RS_RX : std_logic := '1';
+  signal rom_t : std_logic_vector(15 downto 0) := "1111111000110001";
+  signal rom_addr: std_logic_vector(3 downto 0) := (others=>'1');
+  signal countdown : std_logic_vector(15 downto 0) := (others=>'0');
+
 begin
-
-  main : sub_top port map (
-      clk => clk,
-      rx => data(0),
-      tx => tx);
-
-  clkgen : process
+  uut: news port map (
+    MCLK1 => MCLK1,
+    RS_TX => RS_TX,
+    RS_RX => RS_RX);
+  rom_inf: process(mclk1)
   begin
-    clk <= '1';
-    wait for 1 ns;
-    clk <= '0';
-    wait for 1 ns;
-  end process;
-  
-  input : process
-  begin
-    wait for 100 ns;
-    data <= data(0) & data(31 downto 1);
+    if rising_edge(mclk1) then
+      RS_RX<=rom_t(conv_integer(rom_addr));
+    end if;
   end process;
 
-end tb;
+  send_msg: process(mclk1)
+  begin
+   if rising_edge(mclk1) then
+     if countdown = 0 then
+	     case rom_addr is
+		  when "1001" =>
+    	    rom_addr <= "0000"; 
+        when others =>
+		    rom_addr <= rom_addr + 1;
+		  end case;
+          countdown <= x"1C06";
+        else
+          countdown <= countdown-1;
+      end if;
+   end if;
+  end process;
+
+
+  clkgen: process
+  begin
+    mclk1<='0';
+    wait for 7 ns;
+    mclk1<='1';
+    wait for 7 ns;
+  end process;
+
+end example;

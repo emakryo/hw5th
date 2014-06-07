@@ -1,57 +1,46 @@
 library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.STD_LOGIC_UNSIGNED.ALL;
-use IEEE.std_logic_arith.ALL;
+use IEEE.STD_LOGIC_1164.all;
+use IEEE.STD_LOGIC_UNSIGNED.all;
 
 entity r232c is
   generic (wtime: std_logic_vector(15 downto 0) := x"1ADB");
-  port (clk : in STD_LOGIC;
-        rx : in STD_LOGIC;
-        data : out std_logic_vector (7 downto 0);
-        ready : out std_logic);
+  Port ( clk  : in  std_logic;
+         data : out  std_logic_vector (7 downto 0) := (others=>'1');
+         ready : out std_logic := '0';
+         rx   : in std_logic);
 end r232c;
 
-architecture whitebox of r232c is
-  signal state : std_logic_vector (3 downto 0) := "1010";
-  signal buf : std_logic_vector (7 downto 0) := (others => '0');
-  signal countdown : std_logic_vector (15 downto 0) := (others => '0');
+architecture blackbox of r232c is
+  signal countdown: std_logic_vector(15 downto 0) := (others=>'0');
+  signal receivebuf: std_logic_vector(7 downto 0) := (others=>'1');
+  signal state: std_logic_vector(3 downto 0) := "1001";
 begin
   statemachine: process(clk)
   begin
     if rising_edge(clk) then
       case state is
-        when "1010" =>
+        when "1001"=>
           if rx = '0' then
-            countdown <= "0" & wtime(15 downto 1);
-            state <= state - 1;
+            state<=state-1;
+            countdown<=wtime;
+            receivebuf<=(others=>'1');
           end if;
-
-        when "1001" =>
-          if countdown = 0 then
-            countdown <= wtime;
-            state <= state - 1;
-          else
-            countdown <= countdown-1;
-          end if;
-
-        when "0000" =>
-          if countdown = 0 then
-            state <= "1010";
-          else
-            countdown <= countdown - 1;
-          end if;
-          
-        when others =>
+		    ready<= '0';
+        when others=>
           if countdown=0 then
-            buf <= rx & buf(7 downto 1);
-            countdown <= wtime;
-            state <= state - 1;
+            receivebuf<=rx&receivebuf(7 downto 1);
+				countdown<=wtime;
+            if state="0000" then
+              state<="1001";
+		        data<=receivebuf;
+				  ready<= '1';
+            else
+              state<=state-1;
+            end if;
           else
-            countdown <= countdown - 1;
+            countdown<=countdown-1;
           end if;
       end case;
     end if;
-  end process;
-  ready <= '1' when state = "0000" else '0';
-  data <= buf;
-end whitebox;
+ end process;
+end blackbox;

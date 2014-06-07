@@ -1,42 +1,33 @@
 library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.STD_LOGIC_ARITH.ALL;
-use IEEE.STD_LOGIC_UNSIGNED.ALL;
+use IEEE.STD_LOGIC_1164.all;
+use IEEE.STD_LOGIC_ARITH.all;
+use IEEE.STD_LOGIC_UNSIGNED.all;
 
 library UNISIM;
-use UNISIM.VComponents.ALL;
+use UNISIM.VComponents.all;
 
 entity top is
-  port (MCLK1 : in std_logic;
-        RS_RX : in std_logic;
-        RS_TX : out std_logic);
+  Port ( MCLK1 : in std_logic;
+         RS_TX : out std_logic;
+         RS_RX : in std_logic);
 end top;
 
-architecture archtop of top is
-  signal clk, iclk: std_logic;
-
-  component sub_top
-    generic (wtime_in : std_logic_vector(15 downto 0) := x"1ADB";
-             wtime_out : std_logic_vector(15 downto 0) := x"1ADB");
-    port (
-      clk : in std_logic;
-      rx : in std_logic;
-      tx : out std_logic);
-  end component;
-
-
+architecture arch of top is
+	signal clk,iclk: std_logic;
+	component sub_top
+		Port(	clk : in std_logic;
+				tx : out std_logic;
+				rx : in std_logic);
+	end component;
 begin
-  ib : ibufg port map (
-    i=>MCLK1,
-    o=>iclk);
-  
-  bg : bufg port map (
-    i=>iclk,
-    o=>clk);
-
-  main : sub_top port map (
-    clk => clk,
-    rx => RS_RX,
-    tx => RS_TX);
-  
-end archtop;
+	ib: IBUFG port map (
+		i=>MCLK1,
+		o=>iclk);
+	bg: BUFG port map (
+		i=>iclk,
+		o=>clk);
+	main : sub_top port map (
+		clk => clk,
+		tx => RS_TX,
+		rx => RS_RX);
+end arch;
