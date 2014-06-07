@@ -16,8 +16,8 @@ architecture archtop of top is
   signal clk, iclk: std_logic;
 
   component sub_top
-    generic (wtime_in : std_logic_vector(15 downto 0) := x"1ADB");
-    generic (wtime_out : std_logic_vector(15 downto 0) := x"1ADB");
+    generic (wtime_in : std_logic_vector(15 downto 0) := x"1ADB";
+             wtime_out : std_logic_vector(15 downto 0) := x"1ADB");
     port (
       clk : in std_logic;
       rx : in std_logic;
