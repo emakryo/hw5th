@@ -24,7 +24,7 @@ begin
           if rx = '0' then
             countdown <= wtime;
             state <= "0000";
-            buf <= rx & buf(6 downto 0);
+            buf <= rx & buf(7 downto 1);
           end if;
 
         when "1000" =>
@@ -34,7 +34,7 @@ begin
 
         when others =>
           if countdown=0 then
-            buf <= rx & buf(6 downto 0);
+            buf <= rx & buf(7 downto 1);
             countdown <= wtime;
             state<=state+1;
           else

@@ -1,8 +1,8 @@
 CC = ghdl
 OPT = -fexplicit --ieee=synopsys
-STOPTIME = 2000ns
+STOPTIME = 10us
 RUNOPT = --stop-time=$(STOPTIME)
-SOURCE = r232c.vhd u232c.vhd top.vhd top_tb.vhd
+SOURCE = r232c.vhd u232c.vhd sub_top.vhd top_tb.vhd
 TARGET = top_tb.vcd
 
 all: $(TARGET)

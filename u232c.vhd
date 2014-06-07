@@ -39,7 +39,7 @@ begin
           if countdown = 0 then
             sendbuf <= "1" & sendbuf(8 downto 1);
             countdown <= wtime;
-            state <= state-1;
+            state <= state+1;
           else
             countdown <= countdown-1;
           end if;
