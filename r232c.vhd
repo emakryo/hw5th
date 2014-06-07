@@ -24,7 +24,6 @@ begin
           if rx = '0' then
             countdown <= wtime;
             state <= "0000";
-            buf <= rx & buf(7 downto 1);
           end if;
 
         when "1000" =>
