@@ -17,7 +17,7 @@ architecture archtop of top is
 
   component sub_top
     generic (wtime_in : std_logic_vector(15 downto 0) := x"1ADB";
-				 wtime_out : std_logic_vector(15 downto 0) := x"1ADB");
+             wtime_out : std_logic_vector(15 downto 0) := x"1ADB");
     port (
       clk : in std_logic;
       rx : in std_logic;

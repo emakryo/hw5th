@@ -12,7 +12,7 @@ entity r232c is
 end r232c;
 
 architecture whitebox of r232c is
-  signal state : std_logic_vector (3 downto 0) := "1001";
+  signal state : std_logic_vector (3 downto 0) := "1010";
   signal buf : std_logic_vector (7 downto 0) := (others => '0');
   signal countdown : std_logic_vector (15 downto 0) := (others => '0');
 begin
@@ -20,28 +20,38 @@ begin
   begin
     if rising_edge(clk) then
       case state is
-        when "1001" =>
+        when "1010" =>
           if rx = '0' then
+            countdown <= "0" & wtime(15 downto 1);
+            state <= state - 1;
+          end if;
+
+        when "1001" =>
+          if countdown = 0 then
             countdown <= wtime;
-            state <= "0000";
+            state <= state - 1;
+          else
+            countdown <= countdown-1;
           end if;
 
-        when "1000" =>
-          if rx='1' then
-            state <= state+1;
+        when "0000" =>
+          if countdown = 0 then
+            state <= "1010";
+          else
+            countdown <= countdown - 1;
           end if;
-
+          
         when others =>
           if countdown=0 then
             buf <= rx & buf(7 downto 1);
             countdown <= wtime;
-            state<=state+1;
+            state <= state - 1;
           else
-            countdown <= countdown-1;
+            countdown <= countdown - 1;
           end if;
       end case;
     end if;
   end process;
-  ready <= '1' when state = "1000" else '0';
+  ready <= '1' when state = "0000" else '0';
   data <= buf;
 end whitebox;
